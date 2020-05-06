@@ -1,5 +1,6 @@
 /.bundle
 /.idea
+/coverage
 /log/*
 /spec/examples.txt
 /tmp/*

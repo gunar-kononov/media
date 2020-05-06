@@ -23,6 +23,8 @@ group :development, :test do
   gem 'factory_bot_rails'
   # Use Faker to generate fake data
   gem 'faker'
+  # Use SimpleCov for code coverage analysis
+  gem 'simplecov', require: false
 end
 
 group :development do
