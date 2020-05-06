@@ -1,0 +1,8 @@
+/.bundle
+/.idea
+/log/*
+/tmp/*
+/vendor/bundle
+/.byebug_history
+/.generators
+/.rakeTasks
