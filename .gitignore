@@ -1,6 +1,7 @@
 /.bundle
 /.idea
 /log/*
+/spec/examples.txt
 /tmp/*
 /vendor/bundle
 /.byebug_history
