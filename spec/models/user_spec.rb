@@ -1,11 +1,10 @@
 require 'rails_helper'
+require 'support/model/valid'
 
 RSpec.describe User, type: :model do
   subject { build_stubbed :user }
 
-  it 'is valid with valid attributes' do
-    expect(subject).to be_valid
-  end
+  include_examples 'valid'
 
   it 'is not valid without an email' do
     subject.email = nil
