@@ -30,6 +30,8 @@ group :development, :test do
   gem 'faker'
   # Use SimpleCov for code coverage analysis
   gem 'simplecov', require: false
+  # Use Database Cleaner for cleaning database between test examples
+  gem 'database_cleaner-active_record'
 end
 
 group :development do
