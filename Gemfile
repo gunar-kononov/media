@@ -16,6 +16,8 @@ gem 'rack-cors'
 # Use Will Paginate and API Pagination for collection pagination
 gem 'will_paginate'
 gem 'api-pagination'
+# Use Money-Rails for handling currency
+gem 'money-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
