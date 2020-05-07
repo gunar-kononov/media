@@ -19,7 +19,7 @@ RSpec.shared_examples 'media' do |type|
   end
 end
 
-RSpec.describe Content, type: :model do
+RSpec.describe Content do
   include_examples 'media', :movie
   include_examples 'media', :season
   include_examples 'media', :episode

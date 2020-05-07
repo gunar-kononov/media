@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'support/model/valid'
 
-RSpec.describe Purchase, type: :model do
+RSpec.describe Purchase do
   subject { build_stubbed :purchase }
 
   include_examples 'valid'

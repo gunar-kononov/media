@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'support/model/valid'
 
-RSpec.describe User, type: :model do
+RSpec.describe User do
   subject { build_stubbed :user }
 
   include_examples 'valid'

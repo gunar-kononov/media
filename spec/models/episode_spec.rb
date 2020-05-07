@@ -3,7 +3,7 @@ require 'support/model/valid'
 require 'support/model/metadata'
 require 'support/model/index'
 
-RSpec.describe Episode, type: :model do
+RSpec.describe Episode do
   subject { build_stubbed :episode }
 
   include_examples 'valid'
