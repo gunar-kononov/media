@@ -13,11 +13,12 @@ gem 'puma'
 gem 'bootsnap', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
-# Use Will Paginate and API Pagination for collection pagination
+# Use Will Paginate for collection pagination
 gem 'will_paginate'
-gem 'api-pagination'
 # Use Money-Rails for handling currency
 gem 'money-rails'
+# Use JSONAPI::Serializers for rendering json
+gem 'jsonapi-serializers'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
