@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe PurchasesController, type: :routing do
+RSpec.describe PurchasesController do
   describe 'routing' do
     it 'routes to #index' do
       expect(get: '/users/1/purchases').to route_to('purchases#index', user_id: '1')
