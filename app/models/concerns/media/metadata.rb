@@ -1,5 +1,3 @@
-require 'active_support/concern'
-
 module Media
   module Metadata
     extend ActiveSupport::Concern

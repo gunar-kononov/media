@@ -14,7 +14,7 @@ FactoryBot.define do
 
     factory :episode_content do
       media factory: :episode
-      parent_content factory: :season_content
+      parent factory: :season_content
     end
   end
 end

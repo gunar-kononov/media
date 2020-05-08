@@ -18,7 +18,7 @@ Array.new(20).each_with_index.map do |_, s|
           index: s + 1
       ),
       purchasable: true,
-      child_contents: Array.new(10).each_with_index.map do |_, e|
+      children: Array.new(10).each_with_index.map do |_, e|
         Content.create!(
             media: Episode.create!(
                 title: Faker::Lorem.sentence.chomp('.'),
