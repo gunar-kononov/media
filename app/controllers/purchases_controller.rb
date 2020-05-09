@@ -4,7 +4,7 @@ class PurchasesController < ApplicationController
   def index
     @purchases = @user.purchases.preload(content: :media).active.order(created_at: :desc)
 
-    if stale?(last_modified: @purchases.maximum(:updated_at), public: true)
+    if stale?(@purchases, public: true)
       render json: serialize_collection(@purchases, url: :user_purchases_url)
     end
   end
