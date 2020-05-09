@@ -19,6 +19,8 @@ gem 'will_paginate'
 gem 'money-rails'
 # Use JSONAPI::Serializers for rendering json
 gem 'jsonapi-serializers'
+# Use Faker to generate fake data
+gem 'faker'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -27,8 +29,6 @@ group :development, :test do
   gem 'rspec-rails'
   # Use Factory Bot for generating random test data
   gem 'factory_bot_rails'
-  # Use Faker to generate fake data
-  gem 'faker'
   # Use SimpleCov for code coverage analysis
   gem 'simplecov', require: false
   # Use Database Cleaner for cleaning database between test examples
