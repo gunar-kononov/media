@@ -33,6 +33,8 @@ group :development, :test do
   gem 'simplecov', require: false
   # Use Database Cleaner for cleaning database between test examples
   gem 'database_cleaner-active_record'
+  # Use JSON Schema for validating JSON objects
+  gem 'json-schema'
 end
 
 group :development do

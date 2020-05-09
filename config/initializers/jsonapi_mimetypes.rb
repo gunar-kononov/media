@@ -1,4 +1,9 @@
-Mime::Type.register('application/vnd.api+json', :api_json)
-ActionDispatch::Request.parameter_parsers[:api_json] = -> (body) {
-  JSON.parse(body)
-}
+module JSONAPI
+  MIMETYPE = "application/vnd.api+json"
+end
+
+Mime::Type.register JSONAPI::MIMETYPE, :json, %W(
+  application/json
+  application/jsonrequest
+  text/x-json
+)

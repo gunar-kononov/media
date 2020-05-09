@@ -1,5 +1,5 @@
 require 'rails_helper'
-require 'support/model/valid'
+require 'support/models/valid'
 
 RSpec.shared_examples 'media' do |type|
   context "of #{type.capitalize} type" do

@@ -1,6 +1,6 @@
 require 'rails_helper'
-require 'support/model/valid'
-require 'support/model/metadata'
+require 'support/models/valid'
+require 'support/models/metadata'
 
 RSpec.describe Movie do
   subject { build_stubbed :movie }

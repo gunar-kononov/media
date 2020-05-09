@@ -42,6 +42,8 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     arel (9.0.0)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
@@ -68,6 +70,8 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
+    json-schema (2.8.0)
+      addressable (>= 2.4)
     jsonapi-serializers (1.0.1)
       activesupport
     listen (3.2.1)
@@ -99,6 +103,7 @@ GEM
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
     pg (1.2.3)
+    public_suffix (4.0.4)
     puma (4.3.3)
       nio4r (~> 2.0)
     rack (2.2.2)
@@ -184,6 +189,7 @@ DEPENDENCIES
   database_cleaner-active_record
   factory_bot_rails
   faker
+  json-schema
   jsonapi-serializers
   listen
   money-rails

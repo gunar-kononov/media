@@ -1,7 +1,7 @@
 require 'rails_helper'
-require 'support/model/valid'
-require 'support/model/metadata'
-require 'support/model/index'
+require 'support/models/valid'
+require 'support/models/metadata'
+require 'support/models/index'
 
 RSpec.describe Episode do
   subject { build_stubbed :episode }
