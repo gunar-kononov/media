@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
   def serialize_record(record, options = {})
     if record.errors.any?
-      JSONAPI::Serializer.serialize_errors(record.errors)
+      error(record.errors)
     else
       options[:is_collection] = false
       serialize record, options
@@ -16,34 +16,49 @@ class ApplicationController < ActionController::API
 
   private
 
+  def paginate(collection, options)
+    size, before, after = params.fetch(:page, {}).values_at(:size, :before, :after)
+
+    raise if size.to_i < 0
+    raise if before && after
+
+    paginated = collection.limit(size || 10)
+    paginated = paginated.before(cursor: before) if before
+    paginated = paginated.after(cursor: after) if after
+
+    options[:meta] = { page: { total: collection.size } }
+    options[:links] = {
+        self: build_url(before: before, after: after, size: size ),
+        first: build_url(after: collection.first_cursor, size: size ),
+        last: build_url(before: collection.last_cursor, size: size )
+    }
+
+    first_cursor = paginated.first.cursor
+    if first_cursor && collection.before(cursor: first_cursor).any?
+      options[:links][:prev] = build_url(before: first_cursor, size: size )
+    end
+
+    last_cursor = paginated.last.cursor
+    if last_cursor && collection.after(cursor: last_cursor).any?
+      options[:links][:next] = build_url(after: last_cursor, size: size )
+    end
+
+    paginated
+  end
+
   def serialize(record_or_collection, options)
     options[:jsonapi] = { version: '1.0' }
     JSONAPI::Serializer.serialize(record_or_collection, options)
   end
 
-  def paginate(collection, options)
-    url_helper = method(options.delete(:url))
-    count = collection.size
-    page = params.fetch(:page, {}).fetch(:number, nil) || 1
-    per_page = params.fetch(:page, {}).fetch(:size, nil) || count
-    paginated = collection.paginate(page: page, per_page: per_page, total_entries: count)
-    options[:meta] = { total: count }
-    if count == 0 || count == per_page
-      options[:links] = { self: url_helper.call }
-    else
-      options[:links] = {
-          self: url_helper.call(page: { number: paginated.current_page, size: per_page }),
-          first: url_helper.call(page: { number: 1, size: per_page }),
-          last: url_helper.call(page: { number: paginated.total_pages, size: per_page })
-      }
-      if paginated.previous_page && !paginated.out_of_bounds?
-        options[:links][:prev] = url_helper.call(page: { number: paginated.previous_page, size: per_page })
-      end
-      if paginated.next_page && !paginated.out_of_bounds?
-        options[:links][:next] = url_helper.call(page: { number: paginated.next_page, size: per_page })
-      end
-    end
+  def error(error)
+    JSONAPI::Serializer.serialize_errors(error)
+  end
 
-    paginated
+  def build_url(params = {})
+    params = params.compact
+    url = request.base_url + request.path
+    url << "?#{URI::unescape({ page: params }.to_query)}" if params.any?
+    url
   end
 end

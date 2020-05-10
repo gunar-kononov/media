@@ -1,8 +1,15 @@
 class ApplicationSerializer
   include JSONAPI::Serializer
 
+  # Links to #show are unavailable
   def self_link; end
 
+  # Keep default attribute name format
+  def format_name(attribute_name)
+    attribute_name
+  end
+
+  # Include relationships in a document only when needed
   def relationships
     with_included_associations { super }
   end
@@ -21,6 +28,6 @@ class ApplicationSerializer
   end
 
   def included?(association, _)
-    context.with_indifferent_access.fetch("include_#{association}", false)
+    public_send "show_#{association}?"
   end
 end

@@ -2,10 +2,10 @@ class PurchasesController < ApplicationController
   before_action :set_user
 
   def index
-    @purchases = @user.purchases.preload(content: :media).active.order(created_at: :desc)
+    @purchases = @user.purchases.preload(content: :media).active.order(created_at: :desc, id: :desc)
 
-    if stale?(@purchases, public: true)
-      render json: serialize_collection(@purchases, url: :user_purchases_url)
+    if stale?(@purchases)
+      render json: serialize_collection(@purchases)
     end
   end
 

@@ -19,9 +19,9 @@ class PurchaseSerializer < ApplicationSerializer
     object.content.media.index
   end
 
-  attributes :quality, :price
+  attributes :quality, :price_cents, :price_currency
 
   def show_index?
-    object.content.media_type == 'Season'
+    type == 'season'
   end
 end

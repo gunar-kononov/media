@@ -1,4 +1,6 @@
 class Content < ApplicationRecord
+  include Media::Cursor
+
   has_many :purchases, inverse_of: :content
   has_many :users, through: :purchases
   belongs_to :media, polymorphic: true, required: true, dependent: :destroy
@@ -11,8 +13,4 @@ class Content < ApplicationRecord
   scope :movies, -> { where(media_type: Movie.name) }
   scope :seasons, -> { where(media_type: Season.name) }
   scope :episodes, -> { where(media_type: Episode.name) }
-
-  def jsonapi_serializer_class_name
-    "#{media_type}Serializer"
-  end
 end

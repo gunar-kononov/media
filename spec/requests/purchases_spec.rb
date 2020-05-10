@@ -10,9 +10,12 @@ RSpec.describe '/purchases' do
   let(:user) { create :user }
 
   describe 'GET /index' do
+    let(:purchases) { Array.new(10).map { create :purchase, user: user } }
+    let(:expired_purchases) { Array.new(2).map { create :expired_purchase, user: user } }
+
     before(:example) do
-      Array.new(10).map { create :purchase, user: user }
-      create :expired_purchase, user: user
+      purchases
+      expired_purchases
     end
 
     let(:request) { get user_purchases_url(user_id: user.id), headers: headers, as: :json }
@@ -27,7 +30,7 @@ RSpec.describe '/purchases' do
 
     context 'with pagination params' do
       let(:request) do
-        get user_purchases_url(user_id: user.id, page: { number: 3, size: 2 }), headers: headers, as: :json
+        get user_purchases_url(user_id: user.id, page: { after: purchases.last&.cursor, size: 2 }), headers: headers, as: :json
       end
 
       it_behaves_like 'paginated api endpoint'
@@ -37,7 +40,7 @@ RSpec.describe '/purchases' do
       end
 
       it 'returns correct total amount of purchases' do
-        expect(json['meta']['total']).to be 10
+        expect(json['meta']['page']['total']).to be 10
       end
     end
   end

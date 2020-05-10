@@ -8,7 +8,9 @@ RSpec.describe '/movies' do
   include_context 'json'
 
   describe 'GET /index' do
-    before(:example) { Array.new(10).map { create :movie_content } }
+    let(:movies) { Array.new(10).map { create :movie_content } }
+
+    before(:example) { movies }
 
     let(:request) { get movies_url, headers: headers, as: :json }
 
@@ -21,7 +23,7 @@ RSpec.describe '/movies' do
     end
 
     context 'with pagination params' do
-      let(:request) { get movies_url(page: { number: 3, size: 2 }), headers: headers, as: :json }
+      let(:request) { get movies_url(page: { after: movies.last&.cursor, size: 2 }), headers: headers, as: :json }
 
       it_behaves_like 'paginated api endpoint'
 
@@ -30,7 +32,7 @@ RSpec.describe '/movies' do
       end
 
       it 'returns correct total amount of movies' do
-        expect(json['meta']['total']).to be 10
+        expect(json['meta']['page']['total']).to be 10
       end
     end
   end

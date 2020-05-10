@@ -1,4 +1,6 @@
 class Purchase < ApplicationRecord
+  include Media::Cursor
+
   EXPIRATION_DAYS = 2.freeze
 
   belongs_to :user, inverse_of: :purchases, required: true

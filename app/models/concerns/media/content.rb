@@ -5,7 +5,7 @@ module Media
     included do
       has_one :content, as: :media, dependent: :destroy
 
-      after_commit { content.try(:touch) }
+      after_commit { content&.touch }
     end
   end
 end

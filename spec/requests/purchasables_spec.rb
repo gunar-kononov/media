@@ -8,9 +8,9 @@ RSpec.describe '/purchasables' do
   include_context 'json'
 
   describe 'GET /index' do
-    before(:example) do
-      Array.new(10).map { create :purchasable_content }
-    end
+    let(:purchasables) { Array.new(10).map { create :purchasable_content } }
+
+    before(:example) { purchasables }
 
     let(:request) { get purchasables_url, headers: headers, as: :json }
 
@@ -23,7 +23,7 @@ RSpec.describe '/purchasables' do
     end
 
     context 'with pagination params' do
-      let(:request) { get purchasables_url(page: { number: 3, size: 2 }), headers: headers, as: :json }
+      let(:request) { get purchasables_url(page: { after: purchasables.last&.cursor, size: 2 }), headers: headers, as: :json }
 
       it_behaves_like 'paginated api endpoint'
 
@@ -32,7 +32,7 @@ RSpec.describe '/purchasables' do
       end
 
       it 'returns correct total amount of purchasables' do
-        expect(json['meta']['total']).to be 10
+        expect(json['meta']['page']['total']).to be 10
       end
     end
   end

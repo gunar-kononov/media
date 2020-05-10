@@ -8,7 +8,9 @@ RSpec.describe '/seasons' do
   include_context 'json'
 
   describe 'GET /index' do
-    before(:example) { Array.new(10).map { create :season_content_with_episodes } }
+    let(:seasons) { Array.new(10).map { create :season_content_with_episodes } }
+
+    before(:example) { seasons }
 
     let(:request) { get seasons_url, headers: headers, as: :json }
 
@@ -25,7 +27,7 @@ RSpec.describe '/seasons' do
     end
 
     context 'with pagination params' do
-      let(:request) { get seasons_url(page: { number: 3, size: 2 }), headers: headers, as: :json }
+      let(:request) { get seasons_url(page: { after: seasons.last&.cursor, size: 2 }), headers: headers, as: :json }
 
       it_behaves_like 'paginated api endpoint'
 
@@ -38,7 +40,7 @@ RSpec.describe '/seasons' do
       end
 
       it 'returns correct total amount of seasons' do
-        expect(json['meta']['total']).to be 10
+        expect(json['meta']['page']['total']).to be 10
       end
     end
   end
