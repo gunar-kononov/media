@@ -10,9 +10,8 @@ class PurchasesController < ApplicationController
   end
 
   def create
-    @purchase = @user.purchases.new(purchase_params)
-    status = @purchase.save ? :created : :conflict
-    render json: serialize_record(@purchase), status: status
+    @purchase = @user.purchases.create(purchase_params)
+    render json: serialize_record(@purchase), status: :created
   end
 
   private

@@ -10,39 +10,13 @@ RSpec.describe '/purchases' do
   let(:user) { create :user }
 
   describe 'GET /index' do
-    let(:purchases) { Array.new(10).map { create :purchase, user: user } }
-    let(:expired_purchases) { Array.new(2).map { create :expired_purchase, user: user } }
+    let(:records) { Array.new(count).map { create :purchase, user: user } }
+    let(:url) { user_purchases_url(params.merge(user_id: user.id)) }
 
-    before(:example) do
-      purchases
-      expired_purchases
-    end
+    let(:expired_purchases) { Array.new(count).map { create :expired_purchase, user: user } }
+    before(:example) { expired_purchases }
 
-    let(:request) { get user_purchases_url(user_id: user.id), headers: headers, as: :json }
-
-    before(:example) { request }
-
-    it_behaves_like 'api endpoint'
-
-    it 'returns correct amount of purchases' do
-      expect(json['data'].length).to be 10
-    end
-
-    context 'with pagination params' do
-      let(:request) do
-        get user_purchases_url(user_id: user.id, page: { after: purchases.last&.cursor, size: 2 }), headers: headers, as: :json
-      end
-
-      it_behaves_like 'paginated api endpoint'
-
-      it 'returns correct amount of purchases' do
-        expect(json['data'].length).to be 2
-      end
-
-      it 'returns correct total amount of purchases' do
-        expect(json['meta']['page']['total']).to be 10
-      end
-    end
+    it_behaves_like 'paginated api endpoint'
   end
 
   describe 'POST /create' do
@@ -76,7 +50,7 @@ RSpec.describe '/purchases' do
       context do
         before(:example) { post_request }
 
-        it_behaves_like 'api endpoint', status: :conflict
+        it_behaves_like 'api endpoint', status: :conflict, error: true
 
         it 'returns an error' do
           expect(json['errors']).to be_present

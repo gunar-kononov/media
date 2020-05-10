@@ -11,7 +11,7 @@ FactoryBot.define do
 
       factory :season_content_with_episodes do
         transient do
-          episode_count { 3 }
+          episode_count { 1 }
         end
 
         after(:create) do |season_content, evaluator|
