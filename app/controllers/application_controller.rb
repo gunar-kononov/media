@@ -57,7 +57,7 @@ class ApplicationController < ActionController::API
 
   def build_url(params = {})
     params = params.compact
-    url = request.base_url + request.path
+    url = request.path
     url << "?#{URI::unescape({ page: params }.to_query)}" if params.any?
     url
   end
