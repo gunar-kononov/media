@@ -3,7 +3,10 @@ class ApplicationController < ActionController::API
 
   def paginate!(collection)
     size, before, after = validate_params!
-    paginated = collection.limit(size || default_page_size).before(cursor: before).after(cursor: after)
+    paginated = collection
+                    .limit(size || default_page_size)
+                    .before(cursor: before)
+                    .after(cursor: after)
     paginated = paginated.reverse_order if before
     paginated
   end
@@ -38,7 +41,12 @@ class ApplicationController < ActionController::API
   end
 
   def cache_key(collection)
-    @cache_key ||= ActiveSupport::Cache.expand_cache_key([*cache_key_with_version, collection.model_name, collection])
+    version, context = cache_key_with_version
+    @cache_key ||=
+        ActiveSupport::Cache.expand_cache_key(
+            [collection.model_name, *context, collection],
+            version
+        )
   end
 
   def serialize(record_or_collection, options)
@@ -66,8 +74,10 @@ class ApplicationController < ActionController::API
         first: path_to_after(original_collection.first_cursor),
         last: path_to_before(original_collection.last_cursor)
     }
-    options[:links][:prev] = path_to_before(first_cursor) if prev_range_exists?(original_collection, first_cursor)
-    options[:links][:next] = path_to_after(last_cursor) if next_range_exists?(original_collection, last_cursor)
+    options[:links][:prev] =
+        path_to_before(first_cursor) if prev_range_exists?(original_collection, first_cursor)
+    options[:links][:next] =
+        path_to_after(last_cursor) if next_range_exists?(original_collection, last_cursor)
     options
   end
 
