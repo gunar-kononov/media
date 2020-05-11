@@ -90,15 +90,13 @@ RSpec.shared_examples 'paginated api endpoint' do |nested: false|
     end
 
     context 'before is an invalid cursor' do
-      let(:before) { Base64.strict_encode64('test;') }
-      let(:after) { nil }
+      let(:before) { 'test' }
 
       include_examples 'api endpoint', status: :bad_request, error: true
     end
 
     context 'after is an invalid cursor' do
-      let(:before) { nil }
-      let(:after) { Base64.strict_encode64(';test') }
+      let(:after) { 'test' }
 
       include_examples 'api endpoint', status: :bad_request, error: true
     end

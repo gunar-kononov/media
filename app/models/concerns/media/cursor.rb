@@ -48,20 +48,16 @@ module Media
       end
 
       def encode_cursor(timestamp, id)
-        Base64.strict_encode64("#{timestamp.strftime('%Y-%m-%d %H:%M:%S.%6N')};#{id}")
+        timestamp.strftime('%Y-%m-%d %H:%M:%S.%6N').unpack('H*').first + id.to_s(16)
       end
 
       def parse_cursor(cursor, param)
-        # Raises ArgumentError
-        parts = Base64.strict_decode64(cursor)
-        timestamp, id = parts.split(';')
-
-        # Raises NoMethodError, Date::Error
-        timestamp = timestamp.to_datetime
+        # Raises Date::Error
+        timestamp = [cursor[0..51]].pack('H*').to_datetime
 
         # Raises TypeError, ArgumentError
-        id = Integer(id)
-      rescue ArgumentError, NoMethodError, Date::Error, TypeError
+        id = Integer(cursor[52..], 16)
+      rescue TypeError, ArgumentError, Date::Error
         raise Media::PaginationError.new(parameter: "page[#{param}]", detail: 'is invalid')
       else
         [timestamp, id]

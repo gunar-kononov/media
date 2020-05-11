@@ -58,7 +58,7 @@ class ApplicationController < ActionController::API
   def validate_params!(params)
     size, before, after = params
 
-    if !size.nil? && Integer(size) <= 0
+    if !size.nil? && Integer(size, 10) <= 0
       raise Media::PaginationError.new(parameter: 'page[size]', detail: 'must be greater than 0')
     end
 
