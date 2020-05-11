@@ -4,9 +4,9 @@ class PurchasesController < ApplicationController
   def index
     @purchases = @user.purchases.preload(content: :media).active.order(created_at: :desc, id: :desc)
 
-    if stale?(@purchases)
-      render json: serialize_collection(@purchases)
-    end
+    paginated = paginate! @purchases
+
+    render json: cache_collection(paginated) if stale_etag?(paginated)
   end
 
   def create
@@ -23,4 +23,10 @@ class PurchasesController < ApplicationController
   def purchase_params
     params.require(:data).require(:attributes).permit(:content_id, :price, :price_currency, :quality)
   end
+
+  def original_collection
+    @purchases
+  end
+
+  def cache_key_with_version; end
 end

@@ -1,5 +1,6 @@
 class Purchase < ApplicationRecord
   include Media::Cursor
+  include Media::CacheKey
 
   EXPIRATION_DAYS = 2.freeze
 

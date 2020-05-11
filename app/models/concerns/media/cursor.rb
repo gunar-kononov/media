@@ -5,28 +5,32 @@ module Media
     included do
       # Assumes descending order
       scope :before, -> (cursor:) do
-        timestamp, id = parse_cursor cursor, :before
+        if cursor
+          timestamp, id = parse_cursor cursor, :before
 
-        equal_timestamps = arel_table[:created_at].eq(timestamp)
-        prev_timestamps = arel_table[:created_at].gt(timestamp)
-        prev_ids = arel_table[:id].gt(id)
+          equal_timestamps = arel_table[:created_at].eq(timestamp)
+          prev_timestamps = arel_table[:created_at].gt(timestamp)
+          prev_ids = arel_table[:id].gt(id)
 
-        result = where equal_timestamps.and(prev_ids)
-        result = where(prev_timestamps).or result
-        result
+          result = where equal_timestamps.and(prev_ids)
+          result = where(prev_timestamps).or result
+          result
+        end
       end
 
       # Assumes descending order
       scope :after, -> (cursor:) do
-        timestamp, id = parse_cursor cursor, :after
+        if cursor
+          timestamp, id = parse_cursor cursor, :after
 
-        equal_timestamps = arel_table[:created_at].eq(timestamp)
-        next_timestamps = arel_table[:created_at].lt(timestamp)
-        next_ids = arel_table[:id].lt(id)
+          equal_timestamps = arel_table[:created_at].eq(timestamp)
+          next_timestamps = arel_table[:created_at].lt(timestamp)
+          next_ids = arel_table[:id].lt(id)
 
-        result = where equal_timestamps.and(next_ids)
-        result = where(next_timestamps).or result
-        result
+          result = where equal_timestamps.and(next_ids)
+          result = where(next_timestamps).or result
+          result
+        end
       end
 
       delegate :encode_cursor, to: :class

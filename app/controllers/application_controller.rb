@@ -1,6 +1,23 @@
 class ApplicationController < ActionController::API
   rescue_from Media::StandardError, with: :error_response
 
+  def paginate!(collection)
+    size, before, after = validate_params!
+    paginated = collection.limit(size || default_page_size).before(cursor: before).after(cursor: after)
+    paginated = paginated.reverse_order if before
+    paginated
+  end
+
+  def cache_collection(collection, options = {})
+    Rails.cache.fetch(cache_key(collection), expires_in: 24.hours) do
+      serialize_collection collection, options
+    end
+  end
+
+  def stale_etag?(collection)
+    stale?(etag: cache_key(collection))
+  end
+
   def serialize_record(record, options = {})
     raise Media::RecordInvalidError.new(errors: record.errors) if record.errors.any?
     options[:is_collection] = false
@@ -8,9 +25,10 @@ class ApplicationController < ActionController::API
   end
 
   def serialize_collection(collection, options = {})
+    loaded = load_collection collection
+    options = build_pagination_data(loaded).merge(options)
     options[:is_collection] = true
-    collection = paginate(collection, options)
-    serialize collection, options
+    serialize loaded, options
   end
 
   private
@@ -19,32 +37,65 @@ class ApplicationController < ActionController::API
     10
   end
 
-  def paginate(collection, options)
-    size, before, after = validate_params! fetch_params
+  def cache_key(collection)
+    @cache_key ||= ActiveSupport::Cache.expand_cache_key([*cache_key_with_version, collection.model_name, collection])
+  end
 
-    paginated = collection.limit(size || default_page_size)
-    paginated = paginated.before(cursor: before).reverse_order.load.reverse if before
-    paginated = paginated.after(cursor: after).load.to_a if after
-    paginated.load unless before || after
+  def serialize(record_or_collection, options)
+    options[:jsonapi] = { version: '1.0' }
+    JSONAPI::Serializer.serialize(record_or_collection, options)
+  end
 
-    options[:meta] = { page: { total: collection.size } }
-    options[:links] = {
-        self: build_url(before: before, after: after, size: size ),
-        first: build_url(after: collection.first_cursor, size: size ),
-        last: build_url(before: collection.last_cursor, size: size )
-    }
+  def error_response(error)
+    render json: error.serializable_hash, status: error.status
+  end
 
+  def load_collection(collection)
+    loaded = collection.load
+    loaded = loaded.reverse if before_param
+    loaded
+  end
+
+  def build_pagination_data(paginated)
     first_cursor = paginated.first&.cursor
-    if first_cursor && collection.before(cursor: first_cursor).any?
-      options[:links][:prev] = build_url(before: first_cursor, size: size )
-    end
-
     last_cursor = paginated.last&.cursor
-    if last_cursor && collection.after(cursor: last_cursor).any?
-      options[:links][:next] = build_url(after: last_cursor, size: size )
-    end
+    options = {}
+    options[:meta] = { page: { total: original_collection.size } }
+    options[:links] = {
+        self: path_to_self,
+        first: path_to_after(original_collection.first_cursor),
+        last: path_to_before(original_collection.last_cursor)
+    }
+    options[:links][:prev] = path_to_before(first_cursor) if prev_range_exists?(original_collection, first_cursor)
+    options[:links][:next] = path_to_after(last_cursor) if next_range_exists?(original_collection, last_cursor)
+    options
+  end
 
-    paginated
+  def prev_range_exists?(collection, cursor)
+    cursor && collection.before(cursor: cursor).any?
+  end
+
+  def next_range_exists?(collection, cursor)
+    cursor && collection.after(cursor: cursor).any?
+  end
+
+  def path_to_self
+    build_path before: before_param, after: after_param, size: size_param
+  end
+
+  def path_to_before(cursor)
+    build_path before: cursor, size: size_param
+  end
+
+  def path_to_after(cursor)
+    build_path after: cursor, size: size_param
+  end
+
+  def build_path(params = {})
+    params = params.compact
+    url = request.path
+    url << "?#{URI::unescape({ page: params }.to_query)}" if params.any?
+    url
   end
 
   def page_params
@@ -55,8 +106,8 @@ class ApplicationController < ActionController::API
     page_params.fetch(:page, {}).values_at(:size, :before, :after)
   end
 
-  def validate_params!(params)
-    size, before, after = params
+  def validate_params!
+    size, before, after = params = fetch_params
 
     if !size.nil? && Integer(size, 10) <= 0
       raise Media::PaginationError.new(parameter: 'page[size]', detail: 'must be greater than 0')
@@ -69,19 +120,18 @@ class ApplicationController < ActionController::API
     raise Media::PaginationError.new(parameter: 'page[size]', detail: 'must be an integer')
   end
 
-  def serialize(record_or_collection, options)
-    options[:jsonapi] = { version: '1.0' }
-    JSONAPI::Serializer.serialize(record_or_collection, options)
+  def size_param
+    size, _, _ = fetch_params
+    size
   end
 
-  def error_response(error)
-    render json: error.serializable_hash, status: error.status
+  def before_param
+    _, before, _ = fetch_params
+    before
   end
 
-  def build_url(params = {})
-    params = params.compact
-    url = request.path
-    url << "?#{URI::unescape({ page: params }.to_query)}" if params.any?
-    url
+  def after_param
+    _, _, after = fetch_params
+    after
   end
 end

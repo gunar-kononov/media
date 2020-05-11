@@ -1,5 +1,6 @@
 class Content < ApplicationRecord
   include Media::Cursor
+  include Media::CacheKey
 
   has_many :purchases, inverse_of: :content
   has_many :users, through: :purchases
