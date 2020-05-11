@@ -80,5 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: media_production
   url: <%= ENV['DATABASE_URL'] %>
